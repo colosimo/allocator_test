@@ -1,0 +1,78 @@
+This is a simple tester for allocators.
+
+It is designed to accept an arbitrary sequence of malloc-like and free-like
+commands, execute them and check memory chunks returned by malloc are not
+overlapping.
+
+* How to compile *
+
+You need to configure Makefile by means of the following environment variables:
+
+- ALLOCATOR_OBJ: the path of the object(s) (.o) files containing the alloc
+  and free functions to be tested; if the object is not present, make
+  will try to compile the .c files having the same name and path of the
+  provided .o. E.g.:
+  if you type:
+     make ALLOCATOR_OBJ=/path/to/allocator.o
+  and /path/to/allocator.c exists, make will call:
+     cc /path/to/allocator.c -o /path/to/allocator.o
+
+- FUNC_INIT: the name of init function in your allocator, if any. FUNC_INIT can
+  be empty: in this case, no function will be called at startup;
+
+- FUNC_PRINTF: the name of init function in your allocator, if any.
+  FUNC_PRINTF can  be empty: in this case, allocator shall call standard printf,
+  or no printf at all.
+
+- FUNC_ALLOC: the name of your alloc function; its syntax must be the same
+  as standard malloc:
+  extern void *call_alloc(size_t size);
+
+- FUNC_FREE: the name of your free function; its syntax, depending on
+  FREE_NEEDS_SIZE variable, can be:
+      - the same as standard malloc (if FREE_NEEDS_SIZE = 0):
+        extern void call_free(void *p);
+      - or it can contain a size parameter (if FREE_NEEDS_SIZE = 1):
+        extern void call_free(void *p, int size);
+
+- FREE_NEEDS_SIZE: can be 0 or 1, see FUNC_FREE above;
+
+- MAX_ALLOC_SIZE: the max number of bytes you want each malloc try to allocate;
+
+- VERBOSE: if 1, it will print the chunk status after each successful
+  alloc or free command.
+
+If no environment variable is set, their default value, provided by Makefile
+will result in an allocator_test acting by 'testing' your libc malloc and free:
+provided that malloc and free are not bugged, this is a way to test
+allocator_test itself against a 'safe' allocator.
+
+
+* How to use *
+
+Commands are provided via standard input, so that interactive usage
+is possible:
+- alloc <N>: call alloc N times, allocating up to MAX_ALLOC_SIZE at each call;
+- free <N>|all: call free N times | free all allocated chunks;
+- status: print chunks status;
+
+Scripted usage is possible as well, by redirecting stdin from a file, e.g.:
+allocator_test < config.txt
+(config.txt will contain one command per line)
+
+If an error is found, the process will stop and will print the bad allocated
+pointer and the chunks status.
+
+
+* Next steps *
+
+- provide a mean to control the size of allocs; e.g. a second optional parameter
+  in alloc command:
+  alloc <ncycles> <size>
+- provide a mean to control the seed of random number generator.
+  In the current implementation, srand(time(NULL)) is called at startup.
+  Since most actions are randomly generated, a command line 'seed' parameter
+  may be useful in order to make a failed test become deterministic, and
+  a bug to be fixed by repeating the very same test at each time.
+
+If you need help, contact me: aurelio@aureliocolosimo.it
