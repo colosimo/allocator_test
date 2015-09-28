@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# BATHOS_PATH is exported by the Makefile
+
+echo "Rebuilding bathos with config $1"
+
+[ -n "$BATHOS_ARCH" ] && arch_arg="ARCH=$BATHOS_ARCH"
+[ -n "$CROSS_COMPILE" ] && cross_compile_arg="CROSS_COMPILE=$CROSS_COMPILE"
+
+make -C $BATHOS_PATH clean
+make -C $BATHOS_PATH $1
+make -C $BATHOS_PATH $arch_arg $cross_compile_arg USER_CFLAGS=$USER_CFLAGS
