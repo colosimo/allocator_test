@@ -30,7 +30,7 @@ run_pre:
 	fi
 
 $(EXE): $(obj-y)
-	$(CC) $(obj-y) -o $(EXE)
+	$(CC) $(obj-y) -o $(EXE) $(CFLAGS_EXTRA)
 
 clean:
 	rm -f $(EXE) *.o *~
