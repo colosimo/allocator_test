@@ -6,7 +6,7 @@ overlapping.
 
 * How to compile *
 
-You need to configure Makefile by means of the following environment variables:
+The build process is driven by the following make variables:
 
 - ALLOCATOR_OBJ: the path of the object(s) (.o) files containing the alloc
   and free functions to be tested; if the object is not present, make
@@ -19,10 +19,6 @@ You need to configure Makefile by means of the following environment variables:
 
 - FUNC_INIT: the name of init function in your allocator, if any. FUNC_INIT can
   be empty: in this case, no function will be called at startup;
-
-- FUNC_PRINTF: the name of init function in your allocator, if any.
-  FUNC_PRINTF can  be empty: in this case, allocator shall call standard printf,
-  or no printf at all.
 
 - FUNC_ALLOC: the name of your alloc function; its syntax must be the same
   as standard malloc:
@@ -42,11 +38,44 @@ You need to configure Makefile by means of the following environment variables:
 - VERBOSE: if 1, it will print the chunk status after each successful
   alloc or free command.
 
-If no environment variable is set, their default value, provided by Makefile
-will result in an allocator_test acting by 'testing' your libc malloc and free:
-provided that malloc and free are not bugged, this is a way to test
-allocator_test itself against a 'safe' allocator.
+- PRE_BUILD_SCRIPT: this command is run before building the allocator test
+  program. It can be used to compile the allocator object files before actually
+  linking them to the allocator test program (see the
+  "bathos_unix_defconfig.conf" file for an example).
 
+- PRE_BUILD_SCRIPT_ARGS: arguments to $(PRE_BUILD_SCRIPT)
+
+- CFLAGS_EXTRA: extra CFLAGS passed to the C compiler when compiling the
+  allocator test program.
+
+Defining all such variables on the command line can be a tedious task, so
+building has been simplified by getting the Makefile to include a configuration
+file containing all the needed definitions. By default, the file named
+"default.conf" is used, which sets the following values:
+
+ALLOCATOR_OBJ =
+FUNC_INIT =
+FUNC_ALLOC = malloc
+FUNC_FREE = free
+FREE_NEEDS_SIZE = 0
+MAX_ALLOC_SIZE = 1024
+VERBOSE = 0
+
+As a result, by default the allocator test program just tests the regular C
+library malloc and free functions.
+
+A second configuration file named bathos_unix_defconfig.conf has been included,
+which tests the bathos allocator. Note that bathos_unix_defconfig.conf runs
+the "pre_build_bathos_for_tests" script before compiling the test program.
+Such script just builds bathos is unix_defconfig configuration, so that
+the user does not need to build the bathos manually.
+
+To build with a given configuration file, just use the CONFIG make variable.
+So, for instance, to build the test program for the bathos allocator just type:
+
+make CONFIG=bathos_unix_defconfig.conf
+
+and you're done.
 
 * How to use *
 
