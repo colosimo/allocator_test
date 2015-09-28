@@ -18,10 +18,6 @@ ifneq ($(FUNC_INIT),)
 	CFLAGS += -Dcall_init=$(FUNC_INIT)
 endif
 
-ifneq ($(FUNC_PRINTF),)
-	CFLAGS += -Dcall_printf=$(FUNC_PRINTF)
-endif
-
 all: run_pre $(EXE)
 
 run_pre:
