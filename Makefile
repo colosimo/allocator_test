@@ -1,15 +1,12 @@
-ALLOCATOR_OBJ ?=
-FUNC_INIT ?=
-FUNC_ALLOC ?= malloc
-FUNC_FREE ?= free
-FUNC_PRINTF ?=
-FREE_NEEDS_SIZE ?= 0
-MAX_ALLOC_SIZE ?= 1024
-VERBOSE ?= 0
+CONFIG:=default.conf
+
+-include $(CONFIG)
 
 EXE = allocator_test
 
 obj-y := $(ALLOCATOR_OBJ) main.o
+
+PRE_BUILD_SCRIPT ?= true
 
 CFLAGS += -Dcall_alloc=$(FUNC_ALLOC) \
           -Dcall_free=$(FUNC_FREE) \
@@ -25,11 +22,19 @@ ifneq ($(FUNC_PRINTF),)
 	CFLAGS += -Dcall_printf=$(FUNC_PRINTF)
 endif
 
-all: $(EXE)
+all: run_pre $(EXE)
+
+run_pre:
+	if [ -x $(PRE_BUILD_SCRIPT) ] ; then \
+		$(PRE_BUILD_SCRIPT) $(PRE_BUILD_SCRIPT_ARGS) ; \
+	fi
 
 $(EXE): $(obj-y)
 	$(CC) $(obj-y) -o $(EXE)
 
 clean:
 	rm -f $(EXE) *.o *~
+
+
+.PHONY: run_pre
 
