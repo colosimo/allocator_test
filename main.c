@@ -105,8 +105,8 @@ int exec_alloc(void)
 		}
 
 		if (chks[i].ptr &&
-			p + size >= chks[i].ptr &&
-			p + size < chks[i].ptr + chks[i].size) {
+			p + size - 1 >= chks[i].ptr &&
+			p + size - 1 < chks[i].ptr + chks[i].size) {
 			printf("%p + 0x%x overlaps\n", p, size);
 			return -EINVAL;
 		}
