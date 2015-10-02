@@ -21,8 +21,9 @@ endif
 all: run_pre $(EXE)
 
 run_pre:
-	if [ -x $(PRE_BUILD_SCRIPT) ] ; then \
-		$(PRE_BUILD_SCRIPT) $(PRE_BUILD_SCRIPT_ARGS) ; \
+	@if [ -x $(PRE_BUILD_SCRIPT) ] ; then \
+		echo "exec $(PRE_BUILD_SCRIPT) $(PRE_BUILD_SCRIPT_ARGS)"; \
+		$(PRE_BUILD_SCRIPT) $(PRE_BUILD_SCRIPT_ARGS); \
 	fi
 
 $(EXE): $(obj-y)
