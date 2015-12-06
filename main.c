@@ -22,6 +22,7 @@ unsigned nchunks = NCHUNKS_DEF;
 struct chunk *chks;
 unsigned nalloc = 0;
 int ovrlp_idx = -1;
+unsigned max_alloc_size = MAX_ALLOC_SIZE;
 
 #ifdef call_init
 extern int call_init(void);
@@ -69,7 +70,7 @@ int exec_alloc(void)
 	struct chunk *newchks;
 
 	ovrlp_idx = -1;
-	size = (rand() % MAX_ALLOC_SIZE) + 1;
+	size = (rand() % max_alloc_size) + 1;
 
 	if (nchunks == nalloc) {
 		newchks = realloc(chks, 2 * nchunks * sizeof(chks[0]));
@@ -179,6 +180,9 @@ int main(int argc, char *argv[])
 					ncycles, nalloc);
 				continue;
 			}
+		} else if (strncmp(ln, "max ", 4) == 0) {
+			max_alloc_size = atoi(&ln[4]);
+			continue;
 		} else if (strncmp(ln, "status", 6) == 0) {
 			print_chunks();
 			continue;
@@ -186,6 +190,7 @@ int main(int argc, char *argv[])
 			printf("Type your commands:\n"
 				"\talloc <N>: call alloc N times\n"
 				"\tfree <N>|all: call free N times | free all\n"
+				"\tmax <N>: set N as maximum length for allocs\n"
 				"\tstatus: print chunks status\n"
 				"\t^D: end\n");
 			continue;
