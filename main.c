@@ -22,20 +22,6 @@ unsigned nchunks = NCHUNKS_DEF;
 struct chunk *chks;
 unsigned nalloc = 0;
 
-#ifdef call_printf
-int call_printf(const char *fmt, ...)
-{
-        va_list args;
-        int ret;
-
-        va_start(args, fmt);
-        ret = vprintf(fmt, args);
-        va_end(args);
-
-        return ret;
-}
-#endif
-
 #ifdef call_init
 extern int call_init(void);
 #endif
