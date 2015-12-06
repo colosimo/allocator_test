@@ -83,6 +83,7 @@ Commands are provided via standard input, so that interactive usage
 is possible:
 - alloc <N>: call alloc N times, allocating up to MAX_ALLOC_SIZE at each call;
 - free <N>|all: call free N times | free all allocated chunks;
+- max <N>: set max allocator size to N;
 - status: print chunks status;
 
 Scripted usage is possible as well, by redirecting stdin from a file, e.g.:
