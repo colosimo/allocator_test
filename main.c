@@ -21,6 +21,7 @@ struct chunk {
 unsigned nchunks = NCHUNKS_DEF;
 struct chunk *chks;
 unsigned nalloc = 0;
+int ovrlp_idx = -1;
 
 #ifdef call_init
 extern int call_init(void);
@@ -38,12 +39,16 @@ void print_chunks()
 {
 	int i;
 	struct chunk *c;
+	const char *mark = "";
 	printf("Chunks list: %d chunks\n", nalloc);
 	for (i = 0; i < nchunks; i++) {
 		c  = &chks[i];
-		if (c->ptr)
-			printf("%p - %p (%4d bytes)\n",
-				c->ptr,	c->ptr + c->size, c->size);
+		if (c->ptr) {
+			if (i == ovrlp_idx)
+				mark = " <--";
+			printf("%p - %p (%4d bytes)%s\n",
+				c->ptr,	c->ptr + c->size, c->size, mark);
+		}
 	}
 }
 
@@ -63,6 +68,7 @@ int exec_alloc(void)
 	int i;
 	struct chunk *newchks;
 
+	ovrlp_idx = -1;
 	size = (rand() % MAX_ALLOC_SIZE) + 1;
 
 	if (nchunks == nalloc) {
@@ -87,6 +93,7 @@ int exec_alloc(void)
 		if (chks[i].ptr &&
 			p >= chks[i].ptr && p < chks[i].ptr + chks[i].size) {
 			printf("%p overlaps\n", p);
+			ovrlp_idx = i;
 			return -EINVAL;
 		}
 
@@ -94,6 +101,7 @@ int exec_alloc(void)
 			p + size - 1 >= chks[i].ptr &&
 			p + size - 1 < chks[i].ptr + chks[i].size) {
 			printf("%p + 0x%x overlaps\n", p, size);
+			ovrlp_idx = i;
 			return -EINVAL;
 		}
 	}
